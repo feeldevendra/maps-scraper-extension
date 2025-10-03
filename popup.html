@@ -1,10 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <title>Maps Scraper</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <h3>Maps Scraper</h3>
-  <p>Scraping runs automatically on supported pages.</p>
+<body class="popup">
+  <div class="card">
+    <h2>Maps Company Scraper</h2>
+    <p class="muted">Upload CSV with <code>Company Name,Country</code> per row</p>
+
+    <label class="file-drop">
+      <input id="csvFile" type="file" accept=".csv" />
+      <span id="fileLabel">Choose CSV or drop here</span>
+    </label>
+
+    <div class="row">
+      <button id="startBtn" class="btn primary">Start Scraping</button>
+      <button id="clearBtn" class="btn">Clear Results</button>
+    </div>
+
+    <p id="status" class="muted">Status: idle</p>
+    <small class="hint">Open Google Maps will be opened automatically and scraping will begin.</small>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 </html>
