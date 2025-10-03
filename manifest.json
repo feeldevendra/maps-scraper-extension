@@ -1,24 +1,29 @@
 {
   "manifest_version": 3,
-  "name": "Maps Info Scraper - Batch CSV",
-  "version": "1.1",
-  "description": "Reads CSV of company + country, searches Google Maps, scrapes details and exports CSV.",
-  "permissions": ["tabs", "scripting", "activeTab", "storage"],
-  "host_permissions": [
-    "https://www.google.com/*",
-    "<all_urls>"
-  ],
+  "name": "Maps Scraper Extension",
+  "version": "1.0",
+  "description": "Scrapes data from Google Maps and shows results.",
+  "permissions": ["storage", "tabs", "scripting"],
+
   "background": {
     "service_worker": "background.js"
   },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+
   "action": {
     "default_popup": "popup.html"
   },
-  "content_scripts": [
+
+  "web_accessible_resources": [
     {
-      "matches": ["https://www.google.com/maps/*"],
-      "js": ["content.js"]
+      "resources": ["results.html"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
-
