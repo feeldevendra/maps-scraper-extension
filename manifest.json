@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Maps Scraper Extension",
   "version": "1.0",
-  "description": "Scrapes data from Google Maps and shows results.",
+  "description": "Scrapes data from Google Maps and shows results in a new tab.",
   "permissions": ["storage", "tabs", "scripting"],
 
   "background": {
