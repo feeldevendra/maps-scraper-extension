@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Scraped Data</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    pre { background: #f4f4f4; padding: 15px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }
-  </style>
+  <meta charset="utf-8" />
+  <title>Scraped Results</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h2>Scraped Data</h2>
-  <pre id="output">Loading...</pre>
+  <div class="results-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2>Scraped Results</h2>
+      <div class="controls">
+        <button id="downloadBtn" class="btn primary">Export CSV</button>
+        <button id="clearBtn" class="btn secondary">Clear</button>
+      </div>
+    </div>
+
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Company</th>
+          <th>Country</th>
+          <th>Place Name</th>
+          <th>Phone</th>
+          <th>Website</th>
+          <th>Address</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
   <script src="results.js"></script>
 </body>
 </html>
