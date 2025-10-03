@@ -1,74 +1,95 @@
-let entries = [];
-let latestResults = [];
+// popup.js
+const fileInput = document.getElementById("csvFile");
+const fileLabel = document.getElementById("fileLabel");
+const startBtn = document.getElementById("startBtn");
+const statusEl = document.getElementById("status");
+const clearBtn = document.getElementById("clearBtn");
 
-function parseCSV(text) {
-  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-  const rows = lines.map(line => line.split(',').map(c=>c.trim()));
-  if (rows.length && rows[0].length>=2) {
-    const h0 = rows[0][0].toLowerCase();
-    const h1 = rows[0][1].toLowerCase();
-    if ((h0.includes('name') && h1.includes('country')) || (h0.includes('company') && h1.includes('country'))) {
-      rows.shift();
-    }
-  }
-  return rows.map(r => ({ name: r[0]||'', country: r[1]||'' }));
+let parsedCompanies = [];
+
+fileInput.addEventListener("change", handleFile);
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  fileLabel.textContent = file.name;
+  readCSV(file);
 }
 
-document.getElementById('startBtn').addEventListener('click', () => {
-  const fileInput = document.getElementById('csvFile');
-  if (!fileInput.files.length) { alert('Please upload a CSV file first'); return; }
+function readCSV(file) {
   const reader = new FileReader();
-  reader.onload = function(e) {
-    entries = parseCSV(e.target.result);
-    if (!entries.length) { alert('No rows found'); return; }
-    chrome.runtime.sendMessage({ type: 'startScrape', data: entries }, () => {
-      showStatus('Scraping started for ' + entries.length + ' items.');
-    });
+  reader.onload = function(ev) {
+    const text = ev.target.result;
+    parsedCompanies = parseCSV(text);
+    statusEl.textContent = `Loaded ${parsedCompanies.length} rows`;
+    // store for content script
+    chrome.storage.local.set({ companyList: parsedCompanies }, () => {});
   };
-  reader.readAsText(fileInput.files[0]);
-});
-
-function showStatus(msg) {
-  document.getElementById('results').innerText = msg;
+  reader.readAsText(file);
 }
 
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.type === 'scrapeComplete') {
-    latestResults = message.data || [];
-    showResults(latestResults);
+// Simple CSV parser (handles commas inside quotes)
+function parseCSV(text) {
+  const lines = [];
+  let cur = "";
+  let inQuotes = false;
+  let row = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if (ch === "," && !inQuotes) {
+      row.push(cur.trim());
+      cur = "";
+      continue;
+    }
+    if ((ch === "\n" || ch === "\r") && !inQuotes) {
+      if (cur !== "" || row.length) {
+        row.push(cur.trim());
+        lines.push(row);
+        row = [];
+        cur = "";
+      }
+      // skip extra \r or \n
+      while (text[i+1] === "\n" || text[i+1] === "\r") i++;
+      continue;
+    }
+    cur += ch;
   }
-});
-
-function showResults(rows) {
-  const el = document.getElementById('results');
-  if (!rows.length) { el.innerText = 'No results'; return; }
-  const headers = ['Search Name','Country','Name','Address','Website','Phone','Email'];
-  const csvLines = [headers.join(',')].concat(rows.map(r => {
-    return [r.search_name||'', r.country||'', r.name||'', r.address||'', r.website||'', r.phone||'', r.email||'']
-      .map(escapeCsv).join(',');
+  if (cur !== "" || row.length) {
+    row.push(cur.trim());
+    lines.push(row);
+  }
+  // Normalize to objects {name, country}
+  return lines.filter(r => r.length >= 1).map(r => ({
+    name: (r[0] || "").trim(),
+    country: (r[1] || "").trim()
   }));
-  el.innerText = 'Scrape complete. ' + rows.length + ' items.';
-  el.dataset.csv = csvLines.join('\n');
 }
 
-function escapeCsv(s){
-  if (!s) return '';
-  if (s.includes(',') || s.includes('\n') || s.includes('"')) {
-    return '"' + s.replace(/"/g,'""') + '"';
-  }
-  return s;
-}
-
-document.getElementById('downloadBtn').addEventListener('click', () => {
-  const el = document.getElementById('results');
-  const csv = el.dataset.csv || '';
-  if (!csv) { alert('No results yet. Run a scrape first.'); return; }
-  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'maps_scraped_results.csv';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+startBtn.addEventListener("click", () => {
+  // fetch stored companies (in case file already stored)
+  chrome.storage.local.get(["companyList"], (res) => {
+    const companies = res.companyList || parsedCompanies || [];
+    if (!companies || companies.length === 0) {
+      alert("Please upload a CSV first (Company,Country).");
+      return;
+    }
+    statusEl.textContent = "Starting scraping...";
+    // clear old results first
+    chrome.runtime.sendMessage({ action: "clearResults" }, () => {
+      // tell background to start (will open results and maps)
+      chrome.runtime.sendMessage({ action: "startScraping" }, (response) => {
+        statusEl.textContent = "Scraping started — Maps tab opened.";
+      });
+    });
+  });
 });
+
+clearBtn.addEventListener("click", () => {
+  chrome.runtime.sendMessage({ action: "clearResults" }, (resp) => {
+    statusEl.textContent = "Results cleared";
+  });
+});
+
