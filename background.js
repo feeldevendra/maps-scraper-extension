@@ -111,3 +111,12 @@ async function fetchEmailFromWebsite(url) {
   if (m && m.length) return m[0];
   return null;
 }
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "openResultsPage") {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("results.html")
+    });
+  }
+});
+
