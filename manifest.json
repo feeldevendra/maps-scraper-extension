@@ -1,28 +1,26 @@
 {
   "manifest_version": 3,
-  "name": "Maps Scraper Extension",
+  "name": "Maps Company Scraper",
   "version": "1.0",
-  "description": "Scrapes data from Google Maps and shows results in a new tab.",
-  "permissions": ["storage", "tabs", "scripting"],
-
+  "description": "Upload CSV of companies, search on Google Maps, scrape details, show live results and export CSV.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://www.google.com/maps/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
-
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
-  ],
-
   "action": {
     "default_popup": "popup.html"
   },
-
   "web_accessible_resources": [
     {
-      "resources": ["results.html"],
+      "resources": ["results.html", "styles.css"],
       "matches": ["<all_urls>"]
     }
   ]
