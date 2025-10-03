@@ -1,0 +1,17 @@
+/* styles.css */
+body { font-family: Inter, Arial, sans-serif; margin:0; padding:0; background:#f6f8fb; color:#111; }
+.popup .card { width:320px; padding:18px; background:white; border-radius:10px; box-shadow:0 6px 18px rgba(15,15,30,0.08); margin:12px; }
+h2 { margin:0 0 6px 0; font-size:18px; }
+.muted { color:#6b7280; font-size:12px; margin:6px 0; }
+.file-drop { display:block; border:1px dashed #d1d5db; padding:12px; border-radius:8px; text-align:center; cursor:pointer; margin-bottom:10px; background:#fbfcfe; }
+.file-drop input { display:none; }
+.row { display:flex; gap:8px; }
+.btn { padding:8px 12px; border-radius:8px; border:1px solid transparent; cursor:pointer; background:white; }
+.btn.primary { background:#1f6feb; color:white; box-shadow:0 2px 8px rgba(31,111,235,0.15); border:1px solid rgba(31,111,235,0.12); }
+.hint { color:#9ca3af; display:block; margin-top:8px; font-size:12px; }
+table { font-family: Inter, Arial, sans-serif; border-collapse: collapse; width:100%; }
+th, td { border:1px solid #e6e9ef; padding:8px; text-align:left; font-size:13px; }
+th { background:#f3f6fb; }
+.results-wrap { padding:18px; background:white; border-radius:10px; margin:14px; box-shadow:0 6px 18px rgba(15,15,30,0.05); }
+.controls { display:flex; gap:8px; margin-bottom:10px; }
+.btn.secondary { background:#f8fafc; border:1px solid #e6e9ef; }
